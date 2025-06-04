@@ -103,6 +103,11 @@ Whether you send 1 form or 1,000, Instafill.ai adapts to your process, fills eve
 
 👉 **Try Instafill.ai now at [https://instafill.ai](https://instafill.ai)** — and let AI handle the busywork.
 
+## Case studies
+- [Legal AI Case Study: Intake forms automated with AI](https://blog.instafill.ai/2025/04/30/legal-ai-case-study-email-automation-ghny-law/)
+- [Filling 250 PDF forms in bulk with AI](https://blog.instafill.ai/2025/05/13/case-study-how-kona-ice-automates-michigan-stfu-permits-with-instafill-ai-batch-fill/)
+
+
 
 ### Our tech stack
 [https://stackshare.io/instafill-ai/instafill-ai](https://stackshare.io/instafill-ai/instafill-ai)
