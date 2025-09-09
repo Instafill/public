@@ -119,6 +119,10 @@ Whether you send 1 form or 1,000, Instafill.ai adapts to your process, fills eve
 
 [https://stackshare.io/jopilot/jopilot](https://stackshare.io/jopilot/jopilot)
 
+### Links
+
 [Benefits of using Instafill.ai](https://www.perplexity.ai/page/Benefits-of-Using-FhkjjKnWRrWNhllhEJLaUw)
 
 [Filling out W-2 PDF form with AI](https://www.perplexity.ai/page/efficient-ai-solutions-for-w-2-Pue_CK.ETLu9Egt.kGOpBQ)
+
+[Instafill.ai on LinkTree](https://linktr.ee/instafill)
