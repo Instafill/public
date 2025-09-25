@@ -1,0 +1,351 @@
+{
+  "name": "Instafill API",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -128
+      ],
+      "id": "22a11e01-28de-443d-8b12-a36402e6e547",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.instafill.ai/v1/forms/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/pdf"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "blank_form",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -160,
+        -128
+      ],
+      "id": "c7320e45-5cf7-4e89-9714-11bfe93de2ec",
+      "name": "Upload pdf file. call /forms/upload",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "2ukZHwCCRYpQnhnt",
+          "name": "instafill api key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.instafill.ai/v1/sessions/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "form_id",
+              "value": "={{ $json.form_id }}"
+            },
+            {
+              "name": "text_info",
+              "value": "Use this text to fill out a form, like name: Taras QAn8n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        48,
+        -128
+      ],
+      "id": "522cc5fa-7632-4d35-8e69-e2e2d891b7da",
+      "name": "Start autofill. call /sessions",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "2ukZHwCCRYpQnhnt",
+          "name": "instafill api key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        -128
+      ],
+      "id": "b693078b-527f-4775-ae26-0ca3048184d9",
+      "name": "Wait",
+      "webhookId": "a8a87db2-48c6-49b5-b221-c9d797f108eb"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Use workflow-scoped storage for the counter\nconst data = $getWorkflowStaticData('global');\nconst maxAttempts = 600;\n\n// Initialize or increment attempts\nif (data.attempts === undefined) {\n  data.attempts = 1;\n} else {\n  data.attempts = data.attempts + 1;\n}\n\nconsole.log(`Current attempts: ${data.attempts}`);\n\n// Stop the workflow if limit reached\nif (data.attempts > maxAttempts) {\n  throw new Error(`Max attempts (${maxAttempts}) reached`);\n}\nreturn [{ json: { status: 'ok', attempts: data.attempts } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        -16
+      ],
+      "id": "050d46bc-09d4-4c24-864f-f87c57436799",
+      "name": "Check maxAttempts",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "url": "https://themodernfirm.com/wp-content/uploads/2017/12/Sample-Fillable-PDF.pdf",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "blank_form"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        -128
+      ],
+      "id": "c57325b0-3a1f-4444-92fd-10e5bf15d53d",
+      "name": "Get test pdf form"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.instafill.ai/v1/sessions/{{ $('Start autofill. call /sessions').item.json.session_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        -128
+      ],
+      "id": "d2dbf1ce-1ac9-46b8-9c37-0973482fc88b",
+      "name": "Get autofill status",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "2ukZHwCCRYpQnhnt",
+          "name": "instafill api key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7f4afe9f-a024-422c-96a9-00fe9192297d",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        720,
+        -128
+      ],
+      "id": "09e1e34e-d0cf-43bb-9a37-708cfd795860",
+      "name": "If autofill status is completed"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.instafill.ai/v1/sessions/{{ $('Start autofill. call /sessions').item.json.session_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/pdf"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "filled_pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -144
+      ],
+      "id": "0d873cfa-bcfb-42e7-873f-132958e07dc7",
+      "name": "Download filled pdf",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "2ukZHwCCRYpQnhnt",
+          "name": "instafill api key"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get test pdf form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload pdf file. call /forms/upload": {
+      "main": [
+        [
+          {
+            "node": "Start autofill. call /sessions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start autofill. call /sessions": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get autofill status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check maxAttempts": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get test pdf form": {
+      "main": [
+        [
+          {
+            "node": "Upload pdf file. call /forms/upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get autofill status": {
+      "main": [
+        [
+          {
+            "node": "If autofill status is completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If autofill status is completed": {
+      "main": [
+        [
+          {
+            "node": "Download filled pdf",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check maxAttempts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "186ab739-24f4-4f54-9afd-d87e6707936b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cb5e683c998acde75fe31d3d3203fe0e3d5e946f5c29ffdbb703ca1c68da4884"
+  },
+  "id": "4aGnwg1geOs3Qllz",
+  "tags": []
+}
